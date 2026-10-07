@@ -8,8 +8,9 @@ The Game Master describes their real neighbourhood on a phone (a neem tree, a Ha
 It's for kids, families, housing societies, school camps — anyone whose idea of fun has been stuck behind a screen. The screen is only the starting line and the referee; the game itself happens under the sky.
 
 ## Demo
-Run locally in 4 steps (see README) and open `http://<your-laptop-IP>:5000` on any phone on the same WiFi.
-- Deployed link: *(coming soon — Render)*
+**🔗 LIVE: [https://sherlawn-holmes.onrender.com](https://sherlawn-holmes.onrender.com)** — open it on any phone, no setup needed. (Free Render instance sleeps after ~15 min idle, so the first hit may take 30–60 s to wake up.)
+
+Prefer it offline? Run locally in 4 steps (see README) and open `http://<your-laptop-IP>:5000` on any phone on the same WiFi — or flip `USE_OLLAMA=1` and the whole game runs on a local Gemma model with zero internet.
 - Video demo: *(link here)*
 
 ## Code

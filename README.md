@@ -4,6 +4,9 @@ Mobile-friendly outdoor scavenger hunt. The Game Master describes the area, Gemm
 riddles, teams race outside to photograph the answers, and Gemma judges each photo
 (correct? outdoors? funny comment?). No database, no login — one Flask file + one HTML page.
 
+**▶️ Play now (hosted on Render, free tier):** https://sherlawn-holmes.onrender.com
+*First visit after idle may take 30–60 s while the free instance wakes up.*
+
 ## Setup (4 steps)
 
 1. **Install**
