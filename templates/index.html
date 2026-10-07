@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1e6b34">
+<title>Grass Hunt 🌿</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Outfit:wght@400;600;800&family=Noto+Sans+Devanagari:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --green-900:#0f3d1e; --green-700:#1e6b34; --green-500:#2e9e4f;
+    --green-300:#7ed491; --lime:#d9f7a7; --cream:#f6fff0;
+    --sun:#ffd93d; --terra:#ff7b54; --ink:#12271a;
+    --card:#ffffff; --shadow:0 10px 30px rgba(15,61,30,.18);
+  }
+  *{box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent}
+  html,body{height:100%}
+  body{
+    font-family:'Outfit','Noto Sans Devanagari',system-ui,sans-serif;
+    color:var(--ink); background:linear-gradient(160deg,#eafbe7 0%,#d3f2cf 45%,#bfeeb8 100%);
+    min-height:100dvh; overflow-x:hidden;
+  }
+  body::before{ /* floating leaf emojis */
+    content:"🍃"; position:fixed; top:-2rem; left:8%; font-size:2.2rem; opacity:.35;
+    animation:drift 9s linear infinite;
+  }
+  body::after{
+    content:"🌿"; position:fixed; top:-2rem; left:72%; font-size:1.8rem; opacity:.3;
+    animation:drift 13s linear 3s infinite;
+  }
+  @keyframes drift{to{transform:translateY(110vh) rotate(30deg)}}
+
+  .app{max-width:560px; margin:0 auto; padding:14px 16px calc(24px + env(safe-area-inset-bottom)); position:relative}
+  header{display:flex; align-items:center; justify-content:space-between; gap:8px; padding:6px 2px 14px}
+  .logo{font-family:'Baloo 2',cursive; font-weight:800; font-size:1.55rem; color:var(--green-700); line-height:1}
+  .logo small{display:block; font-family:'Outfit'; font-weight:600; font-size:.72rem; color:var(--green-500); letter-spacing:.06em}
+  .badges{display:flex; flex-direction:column; gap:6px; align-items:flex-end}
+  .badge{font-size:.66rem; font-weight:700; padding:4px 10px; border-radius:999px; white-space:nowrap}
+  .badge.model{background:var(--green-700); color:var(--lime)}
+  .badge.mode{border:2px solid var(--green-500); color:var(--green-700); background:#fff; cursor:pointer; user-select:none}
+  .badge.mode.local{background:var(--sun); border-color:var(--sun); color:var(--ink)}
+
+  .screen{display:none; animation:pop .35s ease}
+  .screen.active{display:block}
+  @keyframes pop{from{opacity:0; transform:translateY(14px) scale(.985)}to{opacity:1; transform:none}}
+
+  .card{background:var(--card); border-radius:22px; box-shadow:var(--shadow); padding:20px 18px; margin-bottom:14px}
+  h2{font-family:'Baloo 2',cursive; font-weight:800; color:var(--green-700); font-size:1.35rem; margin-bottom:12px}
+  label{display:block; font-weight:700; font-size:.86rem; color:var(--green-900); margin:14px 0 6px}
+  textarea,select{
+    width:100%; font:inherit; font-size:1.05rem; color:var(--ink);
+    border:2.5px solid var(--green-300); border-radius:14px; padding:12px 14px; background:var(--cream);
+  }
+  textarea{min-height:110px; resize:vertical}
+  textarea:focus,select:focus{outline:none; border-color:var(--green-500); box-shadow:0 0 0 4px rgba(46,158,79,.15)}
+  .row{display:flex; gap:10px}
+  .row>*{flex:1}
+  .chips{display:flex; flex-wrap:wrap; gap:8px}
+  .chip{
+    font-weight:700; font-size:.92rem; padding:10px 16px; border-radius:999px; cursor:pointer;
+    border:2.5px solid var(--green-300); background:var(--cream); color:var(--green-900); transition:.15s;
+  }
+  .chip.sel{background:var(--green-500); border-color:var(--green-500); color:#fff; transform:scale(1.04)}
+  .teams-inputs{display:flex; flex-direction:column; gap:8px}
+  .team-row{display:flex; gap:8px; align-items:center}
+  .dot{width:16px; height:16px; border-radius:50%; flex:none}
+  .team-row input{flex:1; font:inherit; font-size:1.02rem; border:2.5px solid var(--green-300); border-radius:12px; padding:10px 12px; background:var(--cream)}
+  .team-row input:focus{outline:none; border-color:var(--green-500)}
+  .add-team{background:none; border:2.5px dashed var(--green-300); color:var(--green-700); border-radius:12px; padding:9px; font:inherit; font-weight:700; cursor:pointer; width:100%}
+
+  .btn{
+    display:block; width:100%; font-family:'Baloo 2',cursive; font-weight:800; font-size:1.25rem;
+    padding:16px; border:none; border-radius:18px; cursor:pointer; transition:.15s;
+    background:var(--green-500); color:#fff; box-shadow:0 6px 0 var(--green-700); margin-top:16px;
+  }
+  .btn:active{transform:translateY(4px); box-shadow:0 2px 0 var(--green-700)}
+  .btn.sun{background:var(--sun); color:var(--ink); box-shadow:0 6px 0 #d9a900}
+  .btn.sun:active{box-shadow:0 2px 0 #d9a900}
+  .btn.ghost{background:#fff; color:var(--green-700); border:2.5px solid var(--green-500); box-shadow:none}
+  .btn:disabled{opacity:.5; pointer-events:none}
+
+  /* play screen */
+  .play-top{display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; gap:8px}
+  .team-tag{font-family:'Baloo 2',cursive; font-weight:800; font-size:1.05rem; color:#fff; padding:8px 16px; border-radius:999px}
+  .round-tag{font-weight:800; font-size:.85rem; color:var(--green-700); background:var(--lime); padding:7px 13px; border-radius:999px}
+  .timer{
+    font-family:'Baloo 2',cursive; font-weight:800; font-size:2.6rem; text-align:center; color:var(--green-700);
+    letter-spacing:.02em; margin:4px 0;
+  }
+  .timer.low{color:var(--terra); animation:pulse 1s infinite}
+  @keyframes pulse{50%{transform:scale(1.08)}}
+  .tbar{height:10px; border-radius:99px; background:#e2eede; overflow:hidden; margin-bottom:14px}
+  .tbar i{display:block; height:100%; width:100%; background:linear-gradient(90deg,var(--green-500),var(--green-300)); border-radius:99px; transition:width 1s linear}
+  .riddle{
+    font-family:'Baloo 2',cursive; font-weight:700; font-size:1.45rem; line-height:1.45; color:var(--green-900);
+    background:linear-gradient(135deg,var(--lime),#eafff0); border-radius:18px; padding:20px 18px; position:relative;
+    border-left:7px solid var(--green-500);
+  }
+  .speak{position:absolute; top:10px; right:12px; font-size:1.4rem; background:none; border:none; cursor:pointer}
+  .photo-btn{margin-top:14px}
+  input[type=file]{display:none}
+  .verdict{font-family:'Baloo 2',cursive; font-weight:800; font-size:1.25rem; text-align:center; padding:14px; border-radius:16px; margin-top:14px}
+  .verdict.ok{background:#dcffe3; color:var(--green-700)}
+  .verdict.no{background:#ffe8e0; color:#c0392b}
+  .verdict small{display:block; font-family:'Outfit'; font-weight:600; font-size:.9rem; margin-top:4px; color:var(--ink)}
+
+  /* scoreboard */
+  .score-line{display:flex; align-items:center; gap:12px; padding:12px 6px; border-bottom:2px dashed var(--green-300); font-size:1.2rem}
+  .score-line:last-child{border-bottom:none}
+  .score-line .nm{flex:1; font-weight:800}
+  .score-line .pt{font-family:'Baloo 2',cursive; font-weight:800; color:var(--green-700); font-size:1.35rem}
+  .medal{font-size:1.5rem}
+
+  /* final */
+  .winner{font-family:'Baloo 2',cursive; text-align:center; font-size:2rem; font-weight:800; color:var(--green-700); line-height:1.3}
+  .winner .cup{font-size:3.4rem; display:block; animation:bounce 1.2s infinite}
+  @keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+  .gemma-comment{background:var(--lime); border-radius:16px; padding:16px; font-weight:600; font-size:1.05rem; line-height:1.55; margin-top:14px; white-space:pre-wrap}
+
+  /* loader */
+  #loader{position:fixed; inset:0; background:rgba(15,61,30,.55); backdrop-filter:blur(4px); display:none; z-index:50; align-items:center; justify-content:center; flex-direction:column; gap:16px}
+  #loader.on{display:flex}
+  .spin{width:72px; height:72px; border-radius:50%; border:8px solid var(--lime); border-top-color:var(--green-500); animation:rot .9s linear infinite}
+  @keyframes rot{to{transform:rotate(360deg)}}
+  #loader p{color:#fff; font-family:'Baloo 2',cursive; font-weight:700; font-size:1.2rem}
+
+  .toast{position:fixed; left:50%; bottom:26px; transform:translateX(-50%); background:var(--green-900); color:var(--cream); padding:13px 20px; border-radius:14px; font-weight:700; max-width:90vw; z-index:60; display:none; text-align:center}
+  .confetti{position:fixed; top:-12px; font-size:1.4rem; z-index:70; pointer-events:none; animation:fall 1.6s ease-in forwards}
+  @keyframes fall{to{transform:translateY(105vh) rotate(720deg); opacity:.2}}
+  footer{text-align:center; font-size:.75rem; font-weight:600; color:var(--green-700); opacity:.8; margin-top:6px}
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div class="logo">🌿 Grass Hunt<small>OUTDOOR SCAVENGER RACES</small></div>
+    <div class="badges">
+      <span class="badge model">Powered by Gemma (open-weight)</span>
+      <span class="badge mode {{ 'local' if mode=='local' else '' }}" id="modeBadge" title="Gemma brain: cloud API or local Ollama">{{ '🖧 LOCAL · Ollama' if mode=='local' else '☁️ CLOUD · AI Studio' }}</span>
+    </div>
+  </header>
+
+  <!-- ============ SETUP ============ -->
+  <section class="screen active" id="s-setup">
+    <div class="card">
+      <h2>🗺️ Tell Gemma about your area</h2>
+      <textarea id="desc" placeholder="e.g. Our society has a big neem tree, a small temple, a chai stall at the gate, a park with ducks, and lots of pigeons..."></textarea>
+      <label>Language 🗣</label>
+      <div class="chips" id="langChips"></div>
+      <label>Difficulty 💪</label>
+      <div class="chips" id="diffChips"></div>
+      <label>Rounds 🔁</label>
+      <div class="chips" id="roundChips"></div>
+    </div>
+    <div class="card">
+      <h2>👥 Teams (2–4)</h2>
+      <div class="teams-inputs" id="teamInputs"></div>
+      <button class="add-team" id="addTeam" style="margin-top:10px">+ Add team</button>
+    </div>
+    <button class="btn" id="startBtn">🚀 Start the Hunt!</button>
+  </section>
+
+  <!-- ============ PLAY ============ -->
+  <section class="screen" id="s-play">
+    <div class="card">
+      <div class="play-top">
+        <span class="team-tag" id="teamTag"></span>
+        <span class="round-tag" id="roundTag"></span>
+      </div>
+      <div class="timer" id="timer">5:00</div>
+      <div class="tbar"><i id="tfill"></i></div>
+      <div class="riddle"><button class="speak" id="speakBtn" title="Read aloud">🔊</button><span id="riddleText"></span></div>
+      <button class="btn photo-btn" id="photoBtn">📸 Take Photo</button>
+      <input type="file" id="fileInput" accept="image/*" capture="environment">
+      <div id="verdictBox"></div>
+    </div>
+  </section>
+
+  <!-- ============ SCOREBOARD ============ -->
+  <section class="screen" id="s-score">
+    <div class="card">
+      <h2 id="scoreTitle">📊 Scoreboard</h2>
+      <div id="scoreList"></div>
+      <button class="btn" id="nextBtn">Next Round ➡️</button>
+    </div>
+  </section>
+
+  <!-- ============ FINAL ============ -->
+  <section class="screen" id="s-final">
+    <div class="card">
+      <div class="winner"><span class="cup">🏆</span><span id="winnerName"></span></div>
+      <div class="gemma-comment" id="commentBox">Gemini writes the recap…</div>
+      <div id="finalScores" style="margin-top:14px"></div>
+      <button class="btn sun" id="dlBtn">📥 Download Summary</button>
+      <button class="btn" id="againBtn">🔄 Play Again</button>
+    </div>
+  </section>
+
+  <footer>Model: <b id="modelLabel">{{ model }}</b> · runs on your WiFi · no signup, no database</footer>
+</div>
+
+<div id="loader"><div class="spin"></div><p id="loaderMsg">Gemma is thinking… 🌱</p></div>
+<div class="toast" id="toast"></div>
+
+<script>
+const $=id=>document.getElementById(id);
+const LANGS=[["Hinglish","🇮🇳 Hinglish"],["Hindi","हिन्दी"],["Gujarati","ગુજરાતી"],["English","🌍 English"]];
+const DIFFS=[["kids","🧒 Kids"],["normal","🙂 Normal"],["hard","🧠 Hard"]];
+const TEAM_COLORS=["#2e9e4f","#ff7b54","#4a7ddb","#b05fd6"];
+const state={lang:"Hinglish",diff:"normal",rounds:3,teams:[],riddles:[],round:0,roundStart:0,
+  roundLen:300,timerId:null,retryUsed:false,roundScored:false};
+
+/* ---------- chip UI ---------- */
+function chips(el,opts,key){
+  el.innerHTML="";
+  opts.forEach(([v,l])=>{
+    const c=document.createElement("button");
+    c.className="chip"+(state[key]===v?" sel":""); c.textContent=l;
+    c.onclick=()=>{state[key]=v; [...el.children].forEach(x=>x.classList.remove("sel")); c.classList.add("sel");};
+    el.appendChild(c);
+  });
+}
+chips($("langChips"),LANGS,"lang");
+chips($("diffChips"),DIFFS,"diff");
+chips($("roundChips"),[["3","3 rounds"],["4","4 rounds"],["5","5 rounds"]],"rounds");
+
+function teamRow(name){
+  const i=$("teamInputs").children.length;
+  if(i>=4) return;
+  const d=document.createElement("div"); d.className="team-row";
+  d.innerHTML=`<span class="dot" style="background:${TEAM_COLORS[i]}"></span>
+    <input maxlength="16" placeholder="Team ${i+1} name" value="${name||""}">
+    ${i>=2?`<button style="border:none;background:none;font-size:1.2rem;cursor:pointer" onclick="this.parentElement.remove()">❌</button>`:""}`;
+  $("teamInputs").appendChild(d);
+  if($("teamInputs").children.length>=4) $("addTeam").style.display="none";
+}
+$("addTeam").onclick=()=>teamRow();
+teamRow(); teamRow();
+$("roundChips").children[0].classList.remove("sel"); $("roundChips").children[0].classList.add("sel");
+document.querySelectorAll("#roundChips .chip").forEach(c=>c.onclick=e=>{
+  const v=c.textContent[0]; if(v) state.rounds=+v;
+  [...$("roundChips").children].forEach(x=>x.classList.remove("sel")); c.classList.add("sel");
+});
+
+/* ---------- helpers ---------- */
+function show(id){document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));$(id).classList.add("active");scrollTo(0,0);}
+function loader(on,msg){$("loader").classList.toggle("on",on); if(msg)$("loaderMsg").textContent=msg;}
+function toast(m){const t=$("toast"); t.textContent=m; t.style.display="block"; clearTimeout(t._h); t._h=setTimeout(()=>t.style.display="none",4200);}
+async function api(path,body){
+  const r=await fetch(path,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)});
+  const d=await r.json().catch(()=>({error:"Bad server response."}));
+  if(!r.ok||d.error) throw new Error(d.error||"Something went wrong.");
+  return d;
+}
+function confetti(){
+  for(let i=0;i<26;i++){const s=document.createElement("span");s.className="confetti";
+    s.textContent=["🎉","✨","🍀","⭐","🌟"][i%5]; s.style.left=Math.random()*100+"vw";
+    s.style.animationDelay=(Math.random()*.4)+"s"; document.body.appendChild(s); setTimeout(()=>s.remove(),2200);}
+}
+function speak(text){
+  try{window.speechSynthesis.cancel(); const u=new SpeechSynthesisUtterance(text);
+    u.lang={Hinglish:"hi-IN",Hindi:"hi-IN",Gujarati:"gu-IN",English:"en-IN"}[state.lang]||"en-IN";
+    u.rate=.95; window.speechSynthesis.speak(u);}catch(e){}
+}
+
+/* ---------- photo compression ---------- */
+function compress(file){
+  return new Promise((res,rej)=>{
+    const img=new Image(); const url=URL.createObjectURL(file);
+    img.onload=()=>{
+      const sc=Math.min(1,800/Math.max(img.width,img.height));
+      const c=document.createElement("canvas");
+      c.width=Math.round(img.width*sc); c.height=Math.round(img.height*sc);
+      c.getContext("2d").drawImage(img,0,0,c.width,c.height);
+      URL.revokeObjectURL(url);
+      res(c.toDataURL("image/jpeg",0.85));
+    };
+    img.onerror=()=>rej(new Error("Could not read that photo."));
+    img.src=url;
+  });
+}
+
+/* ---------- start ---------- */
+$("startBtn").onclick=async()=>{
+  const desc=$("desc").value.trim();
+  if(desc.length<10) return toast("✍️ Describe your area in a line or two first!");
+  state.teams=[...$("teamInputs").querySelectorAll("input")].map((i,ix)=>({name:i.value.trim()||`Team ${ix+1}`,score:0}));
+  if(state.teams.length<2) return toast("👥 Need at least 2 teams!");
+  loader(true,"Gemma is writing riddles for your area… 🌱");
+  try{
+    const d=await api("/api/riddles",{desc,language:state.lang,difficulty:state.diff,rounds:state.rounds});
+    state.riddles=d.riddles.slice(0,state.rounds); state.round=0;
+    state.teams.forEach(t=>t.score=0);
+    loader(false); startRound();
+  }catch(e){loader(false); toast("😵 "+e.message);}
+};
+
+/* ---------- round ---------- */
+function startRound(){
+  const team=state.teams[state.round%state.teams.length];
+  const r=state.riddles[state.round];
+  state.retryUsed=false; state.roundScored=false; state.roundStart=Date.now();
+  $("teamTag").textContent=`${["🦁","🐯","🦊","🐼"][state.round%4]} ${team.name}`;
+  $("teamTag").style.background=TEAM_COLORS[(state.round%state.teams.length)%4];
+  $("roundTag").textContent=`Round ${state.round+1}/${state.riddles.length}`;
+  $("riddleText").textContent="❓ "+r.riddle;
+  $("verdictBox").innerHTML="";
+  $("photoBtn").disabled=false;
+  show("s-play"); speak(r.riddle);
+  clearInterval(state.timerId); tick();
+  state.timerId=setInterval(tick,1000);
+}
+function tick(){
+  const left=state.roundLen-((Date.now()-state.roundStart)/1000);
+  if(left<=0){clearInterval(state.timerId); timeout(); return;}
+  const m=Math.floor(left/60),s=Math.floor(left%60);
+  $("timer").textContent=`${m}:${String(s).padStart(2,"0")}`;
+  $("timer").classList.toggle("low",left<60);
+  $("tfill").style.width=(left/state.roundLen*100)+"%";
+}
+function timeout(){
+  $("photoBtn").disabled=true;
+  $("verdictBox").innerHTML=`<div class="verdict no">⏰ Time up! Small points lost, big fun gained.<small>Hint was: ${state.riddles[state.round].easy_hint}</small></div>`;
+  setTimeout(nextBreak,2200);
+}
+$("speakBtn").onclick=()=>speak(state.riddles[state.round]?.riddle||"");
+$("photoBtn").onclick=()=>$("fileInput").click();
+$("fileInput").onchange=async e=>{
+  const f=e.target.files[0]; e.target.value="";
+  if(!f||state.roundScored) return;
+  loader(true,"Gemma is inspecting your photo… 🕵️");
+  try{
+    const dataUrl=await compress(f);
+    const r=state.riddles[state.round];
+    const d=await api("/api/judge",{image:dataUrl,riddle:r.riddle,answer_hint:r.answer_hint_for_judge,language:state.lang});
+    loader(false);
+    const elapsed=(Date.now()-state.roundStart)/1000;
+    if(d.correct&&d.outdoors){
+      let pts=state.retryUsed?5:10; if(!state.retryUsed&&elapsed<state.roundLen/2) pts+=5;
+      state.teams[state.round%state.teams.length].score+=pts;
+      state.roundScored=true; $("photoBtn").disabled=true; clearInterval(state.timerId);
+      confetti();
+      $("verdictBox").innerHTML=`<div class="verdict ok">✅ +${pts} points!<small>${d.comment}</small></div>`;
+      speak(d.comment); setTimeout(nextBreak,2600);
+    }else{
+      const why=!d.outdoors?"That looks indoors or like a screen! 📱":"Not quite the target… 🤔";
+      if(!state.retryUsed){
+        state.retryUsed=true; $("timer").textContent="🔁"; $("tfill").style.width="100%";
+        $("verdictBox").innerHTML=`<div class="verdict no">❌ ${why}<small>Easy hint: ${r.easy_hint} — one retry left, worth +5!</small></div>`;
+      }else{
+        state.roundScored=true; $("photoBtn").disabled=true; clearInterval(state.timerId);
+        $("verdictBox").innerHTML=`<div class="verdict no">😅 ${why}<small>${d.comment}</small></div>`;
+        setTimeout(nextBreak,2400);
+      }
+    }
+  }catch(err){loader(false); toast("😵 "+err.message);}
+};
+
+/* ---------- scoreboard ---------- */
+function nextBreak(){show("s-score"); renderScores(state.round>=state.riddles.length-1);}
+$("nextBtn").onclick=()=>{state.round++; startRound();};
+function scoreHtml(){
+  return [...state.teams].sort((a,b)=>b.score-a.score).map((t,i)=>{
+    const c=state.teams.indexOf(t);
+    return `<div class="score-line"><span class="medal">${["🥇","🥈","🥉","🎖️"][i]}</span>
+      <span class="dot" style="background:${TEAM_COLORS[c]}"></span>
+      <span class="nm">${t.name}</span><span class="pt">${t.score}</span></div>`;
+  }).join("");
+}
+function renderScores(last){
+  $("scoreTitle").textContent=(last?"📊 Before the finish…":"📊 Scoreboard");
+  $("scoreList").innerHTML=scoreHtml();
+  $("nextBtn").textContent=last?"🏁 Final Results":"Next Round ➡️";
+}
+
+/* ---------- final ---------- */
+async function finalScreen(){
+  show("s-final"); $("finalScores").innerHTML=scoreHtml();
+  const w=[...state.teams].sort((a,b)=>b.score-a.score);
+  $("winnerName").textContent=w[0].score===w[1]?.score?"It's a TIE! 🤝":`${w[0].name} wins!`;
+  $("commentBox").textContent="Gemma is writing the match commentary… ✍️";
+  try{
+    const d=await api("/api/commentary",{desc:$("desc").value.trim(),scores:state.teams,language:state.lang});
+    $("commentBox").textContent="🎙️ "+d.commentary;
+  }catch(e){$("commentBox").textContent="🎙️ What a hunt! Everyone get outside and run again!";}
+  confetti();
+}
+$("nextBtn").addEventListener("click",()=>{ if(state.round>=state.riddles.length-1) setTimeout(finalScreen,80); });
+
+$("dlBtn").onclick=()=>{
+  const lines=["🌿 GRASS HUNT — Game Summary","Area: "+$("desc").value.trim(),
+    "Language: "+state.lang+" · Difficulty: "+state.diff,"",
+    ...scoreLinesTxt(), ...state.riddles.map((r,i)=>`Round ${i+1}: ${r.riddle}\n  (answer: ${r.answer_hint_for_judge})`),
+    "","🎙️ "+$("commentBox").textContent];
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(new Blob([lines.join("\n")],{type:"text/plain"}));
+  a.download="grass-hunt-summary.txt"; a.click();
+};
+function scoreLinesTxt(){const m={};document.querySelectorAll("#finalScores .score-line").forEach(l=>m[l.querySelector(".nm").textContent]=l.querySelector(".pt").textContent);return Object.entries(m).map(([n,p])=>`🏅 ${n}: ${p} points`);}
+$("againBtn").onclick=()=>{clearInterval(state.timerId); show("s-setup");};
+
+/* timer length from difficulty */
+const DIFF_LEN={kids:360,normal:300,hard:240};
+new MutationObserver(()=>{ if($("s-play").classList.contains("active")) state.roundLen=DIFF_LEN[state.diff]||300; })
+  .observe($("s-play"),{attributes:true,classFilter:true,attributeFilter:["class"]});
+</script>
+</body>
+</html>
